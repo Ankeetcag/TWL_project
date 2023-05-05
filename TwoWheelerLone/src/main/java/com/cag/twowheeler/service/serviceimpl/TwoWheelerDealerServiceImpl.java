@@ -52,13 +52,7 @@ public class TwoWheelerDealerServiceImpl implements TwoWheelerDealerService {
 		List<MainDealerDetailsDto> dealerDetailsDtos = new ArrayList<>();
 		if (!allMainDealers.isEmpty()) {
 			allMainDealers.stream().forEach(e -> {
-
-				String a="jbsb";
-				String aa="jbjnbj";
-				String aa="jbjnbj";
-				String aa="jbjnbj";
-				String aa="jbjnbj";
-				String aa="jbjnbj";
+				
 				MainDealerDetailsDto dealerDetailsDto = MainDealerDetailsDto.builder()
 						.mainDealerAccountHolderName(e.getAccountHolderName())
 						.mainDealerActivationStatus(e.getActivatioinStatus()).mainDealerStatus(e.getStatus())
