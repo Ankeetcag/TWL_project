@@ -1,0 +1,49 @@
+package com.cag.twowheeler.controller;
+
+import java.io.IOException;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
+
+import com.cag.twowheeler.entity.Documents;
+import com.cag.twowheeler.repository.DocumentRepository;
+import com.cag.twowheeler.responce.responce;
+
+@RestController
+public class DocumentUploadController {
+
+	@Autowired
+	DocumentRepository documentRepository;
+
+	@PostMapping("/uploadfile")
+	public ResponseEntity<responce> uploadFile(@RequestParam MultipartFile file) throws IOException {
+
+		if (file != null) {
+			Documents document = Documents.builder().fileName(file.getOriginalFilename()).data(file.getBytes())
+					.fileType(file.getContentType()).build();
+			documentRepository.save(document);
+			return ResponseEntity.status(HttpStatus.OK).body(
+					responce.builder().data(document.getData()).error("FALSE").message("FILE UPLOADED..!").build());
+		}
+		return ResponseEntity.status(HttpStatus.OK)
+				.body(responce.builder().error("FALSE").message("FILE NOT UPLOADED..!").build());
+	}
+
+	@PostMapping("/getfile")
+	public ResponseEntity<responce> getFile(@RequestParam int documentID) throws IOException {
+		Documents documents = documentRepository.findById(documentID).get();
+
+		if (documents != null) {
+			return ResponseEntity.status(HttpStatus.OK)
+					.body(responce.builder().data(documents.getData()).error("FALSE").message("FILE FIND..!").build());
+		}
+		return ResponseEntity.status(HttpStatus.OK)
+				.body(responce.builder().error("FALSE").message("FILE NOT UPLOADED..!").build());
+	}
+}

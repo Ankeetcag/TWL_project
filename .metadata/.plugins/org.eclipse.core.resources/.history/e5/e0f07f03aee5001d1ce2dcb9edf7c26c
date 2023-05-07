@@ -1,0 +1,873 @@
+package com.cag.twowheeler.service.serviceimpl;
+
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
+import javax.swing.text.StyledEditorKit.BoldAction;
+
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.cag.twowheeler.dto.MainDealerDetailsDto;
+import com.cag.twowheeler.dto.SubDealerDetailsDto;
+import com.cag.twowheeler.dto.VehicleVariantDto;
+import com.cag.twowheeler.entity.Branch;
+import com.cag.twowheeler.entity.MainDealer;
+import com.cag.twowheeler.entity.StateAbbreviation;
+import com.cag.twowheeler.entity.SubDealer;
+import com.cag.twowheeler.entity.VehicalPrice;
+import com.cag.twowheeler.entity.VehicalVariant;
+import com.cag.twowheeler.repository.BranchRepository;
+import com.cag.twowheeler.repository.MainDealerRepository;
+import com.cag.twowheeler.repository.StateAbbreviationRepository;
+import com.cag.twowheeler.repository.SubDealerRepository;
+import com.cag.twowheeler.repository.VehicalPriceRepository;
+import com.cag.twowheeler.repository.VehicalVariantRepository;
+import com.cag.twowheeler.service.TwoWheelerDealerService;
+
+import net.bytebuddy.asm.Advice.Local;
+
+@Service
+public class TwoWheelerDealerServiceImpl implements TwoWheelerDealerService {
+
+	@Autowired
+	MainDealerRepository mainDealerRepository;
+	@Autowired
+	SubDealerRepository subDealerRepository;
+	@Autowired
+	StateAbbreviationRepository abbreviationRepository;
+	@Autowired
+	VehicalVariantRepository variantRepository;
+	@Autowired
+	VehicalPriceRepository vehicalPriceRepository;
+	@Autowired
+	BranchRepository branchRepository;
+
+//	@Override
+//	public String addDealer(DealerDetailsDto dealerDetails) {
+//		if (dealerDetails != null) {
+//			MainDealer mainDealer = new MainDealer();
+//			List<SubDealerDto> subDealersdto = dealerDetails.getSubDealers();
+//			List<SubDealer> subDealer = new ArrayList<>();
+//
+//			// subDealerDto list stream
+//			subDealersdto.stream().forEach(e -> {
+//				// sub Dealer Address set
+//				DealerAddressDto dtoAddress = e.getAddress();
+////				DealerAddress 
+//				DealerAddress dealerAddress = DealerAddress.builder().city(dtoAddress.getCity())
+//						.dealerType(dtoAddress.getDealerType()).district(dtoAddress.getDistrict())
+//						.pinCode(dtoAddress.getPinCode()).state(dtoAddress.getState()).village(dtoAddress.getVillage())
+//						.build();
+//
+//				SubDealer dealer = SubDealer.builder().accountHolderName(e.getSubDealerAccountHolderName())
+//						.activationData(LocalDate.now() + "").address(dealerAddress)
+//						.alternateContactNumber(e.getSubDealerAlternateContactNumber())
+//						.bankAccNumber(e.getSubDealerBankAccNumber()).bankBranchName(e.getSubDealerBankBranchName())
+//						.bankName(e.getSubDealerBankName()).contactNumber(e.getSubDealerContactNumber())
+//						.contactPersonName(e.getSubDealerContactPersonName()).dealerName(e.getSubDealerDealerName())
+//						.gstNumber(e.getSubDealerGstNumber()).ifsc(e.getSubDealerIfsc())
+//						.dealerMailID(e.getSubDealerDealerMailID()).manufacturerName(e.getSubDealerManufacturerName())
+//						.panNumber(e.getSubDealerPanNumber()).paymentEligible(true).mainDealers(mainDealer)/* IMP*/
+//						.reviewStatus(e.getSubDealerReviewStatus()).status(e.getSubDealerStatus()).build();
+//				// add object in list
+//				subDealer.add(dealer);
+//
+//			});
+//
+//			// Get DealerAddressDto
+//			DealerAddressDto address = dealerDetails.getAddress();
+//			// DealerAddress Set
+//
+//			// DealerAddress dealerAddress =
+//			DealerAddress build = DealerAddress.builder().city(address.getCity()).dealerType(address.getDealerType())
+//					.district(address.getDistrict()).pinCode(address.getPinCode()).state(address.getState())
+//					.village(address.getVillage()).build();
+//
+//			// mainDealer Object Set
+//			MainDealer mainDealer1 = mainDealer.builder()
+//					.accountHolderName(dealerDetails.getMainDealerAccountHolderName())
+//					.activationData(LocalDate.now() + "").address(build)
+//					.alternateContactNumber(dealerDetails.getMainDealerAlternateContactNumber())
+//					.bankAccNumber(dealerDetails.getMainDealerBankAccNumber())
+//					.bankBranchName(dealerDetails.getMainDealerBankBranchName())
+//					.bankName(dealerDetails.getMainDealerBankName())
+//					.contactNumber(dealerDetails.getMainDealerContactNumber())
+//					.contactPersonName(dealerDetails.getMainDealerContactPersonName())
+//					.dealerName(dealerDetails.getMainDealerName()).gstNumber(dealerDetails.getMainDealerGstNumber())
+//					.ifsc(dealerDetails.getMainDealerIfsc()).dealerMailID(dealerDetails.getMainDealerMailID())
+//					.manufacturerName(dealerDetails.getMainDealerManufacturerName())
+//					.panNumber(dealerDetails.getMainDealerPanNumber()).paymentEligible(true)
+//					.reviewStatus(dealerDetails.getMainDealerReviewStatus()).status(dealerDetails.getMainDealerStatus())
+//					.subDealer(subDealer).build();
+//			BeanUtils.copyProperties(mainDealer1, mainDealer);// It is use full to add main dealer in sub dealer..
+//
+//			dealerRepository.save(mainDealer);
+//			return "data entered sucessfually";
+//		} else {
+//			return "data not entered";
+//		}
+//
+//	}
+
+	@Override
+	public List<MainDealerDetailsDto> getMainDealersDetails() {
+		List<MainDealer> allMainDealers = mainDealerRepository.findAll();
+		List<MainDealerDetailsDto> dealerDetailsDtos = new ArrayList<>();
+		if (!allMainDealers.isEmpty()) {
+			allMainDealers.stream().forEach(e -> {
+
+				MainDealerDetailsDto dealerDetailsDto = MainDealerDetailsDto.builder()
+						.mainDealerAccountHolderName(e.getAccountHolderName())
+						.mainDealerActivationData(e.getActivationData()).mainDealerExpireData(e.getExpiryDate())
+						.mainDealerAlternateContactNumber(e.getAlternateContactNumber())
+						.mainDealerBankAccNumber(e.getBankAccNumber()).mainDealerBankBranchName(e.getBankBranchName())
+						.mainDealerBankName(e.getBankName()).mainDealerContactNumber(e.getContactNumber())
+						.mainDealerContactPersonName(e.getContactPersonName()).mainDealerGstNumber(e.getGstNumber())
+						.mainDealerIfsc(e.getIfsc()).mainDealerMailID(e.getMailID())
+						.mainDealerManufacturerName(e.getManufacturerName()).mainDealerName(e.getDealerName())
+						.mainDealerPanNumber(e.getPanNumber()).mainDealerPaymentEligible(e.getPaymentEligible())
+						.mainDealerID(e.getMainDealerID()).addressDetails(e.getAddressDetails()).city(e.getCity())
+						.contactPersonMobile(e.getContactPersonMobile()).district(e.getDistrict()).state(e.getState())
+						.pinCode(e.getPinCode()).build();
+				dealerDetailsDtos.add(dealerDetailsDto);
+			});
+			return dealerDetailsDtos;
+		}
+		return dealerDetailsDtos;
+	}
+
+	@Override
+	public List<SubDealerDetailsDto> getSubDealerDetails(String mainDealerId) {
+		Optional<MainDealer> mainDealer = mainDealerRepository.findById(mainDealerId);
+		new ArrayList<>();
+		if (mainDealer.isPresent()) {
+			MainDealer mainDealerInfo = mainDealer.get();
+			List<SubDealer> subDealers = mainDealerInfo.getSubDealer();
+			List<SubDealerDetailsDto> allSubDealers = new ArrayList<>();
+			subDealers.stream().forEach(a -> {
+
+				SubDealerDetailsDto subDealerDto = SubDealerDetailsDto.builder()
+						.subDealerAccountHolderName(a.getAccountHolderName())
+						.subDealerActivationData(a.getActivationData()).subDealerExpireData(a.getExpiryDate())
+						.subDealerAlternateContactNumber(a.getAlternateContactNumber())
+						.subDealerBankAccNumber(a.getBankAccNumber()).subDealerBankBranchName(a.getBankBranchName())
+						.subDealerBankName(a.getBankName()).subDealerContactNumber(a.getContactNumber())
+						.subDealerContactPersonName(a.getContactPersonName()).subDealerMailID(a.getMailID())
+						.subDealerName(a.getDealerName()).subDealerGstNumber(a.getGstNumber())
+						.subDealerID(a.getSubDealerID()).subDealerIfsc(a.getIfsc())
+						.subDealerManufacturerName(a.getManufacturerName()).subDealerPanNumber(a.getPanNumber())
+						.subDealerPaymentEligible(a.getPaymentEligible()).addressDetails(a.getAddressDetails())
+						.city(a.getCity()).contactPersonMobile(a.getContactPersonMobile()).district(a.getDistrict())
+						.pinCode(a.getPinCode()).state(a.getState()).build();
+
+				allSubDealers.add(subDealerDto);
+
+			});
+			return allSubDealers;
+		}
+		return new ArrayList<>();
+	}
+
+	/**
+	 * Get Main Dealer By Search/Filter (State or District)
+	 */
+	@Override
+	public List<MainDealerDetailsDto> getMainDealer(String state, String district) {
+		List<MainDealerDetailsDto> maindealers = new ArrayList<>();
+		if (state == null & district != null) {
+			List<MainDealer> allMainDealer = mainDealerRepository.findByDistrict(district);
+			if (!allMainDealer.isEmpty()) {
+				allMainDealer.stream().forEach(e -> {
+					MainDealerDetailsDto dealerDetailsDto = MainDealerDetailsDto.builder()
+							.mainDealerAccountHolderName(e.getAccountHolderName())
+							.mainDealerActivationData(e.getActivationData()).mainDealerExpireData(e.getExpiryDate())
+							.mainDealerAlternateContactNumber(e.getAlternateContactNumber())
+							.mainDealerBankAccNumber(e.getBankAccNumber())
+							.mainDealerBankBranchName(e.getBankBranchName()).mainDealerBankName(e.getBankName())
+							.mainDealerContactNumber(e.getContactNumber())
+							.mainDealerContactPersonName(e.getContactPersonName()).mainDealerGstNumber(e.getGstNumber())
+							.mainDealerIfsc(e.getIfsc()).mainDealerMailID(e.getMailID())
+							.mainDealerManufacturerName(e.getManufacturerName()).mainDealerName(e.getDealerName())
+							.mainDealerPanNumber(e.getPanNumber()).mainDealerPaymentEligible(e.getPaymentEligible())
+							.mainDealerID(e.getMainDealerID()).addressDetails(e.getAddressDetails()).city(e.getCity())
+							.contactPersonMobile(e.getContactPersonMobile()).district(e.getDistrict())
+							.state(e.getState()).pinCode(e.getPinCode()).build();
+					maindealers.add(dealerDetailsDto);
+				});
+				return maindealers;
+			}
+			return new ArrayList<>();
+		} else if (state != null & district == null) {
+			List<MainDealer> allMainDealer = mainDealerRepository.findByState(state);
+			if (!allMainDealer.isEmpty()) {
+				allMainDealer.stream().forEach(e -> {
+
+					MainDealerDetailsDto dealerDetailsDto = MainDealerDetailsDto.builder()
+							.mainDealerAccountHolderName(e.getAccountHolderName())
+							.mainDealerActivationData(e.getActivationData()).mainDealerExpireData(e.getExpiryDate())
+							.mainDealerAlternateContactNumber(e.getAlternateContactNumber())
+							.mainDealerBankAccNumber(e.getBankAccNumber())
+							.mainDealerBankBranchName(e.getBankBranchName()).mainDealerBankName(e.getBankName())
+							.mainDealerContactNumber(e.getContactNumber())
+							.mainDealerContactPersonName(e.getContactPersonName()).mainDealerGstNumber(e.getGstNumber())
+							.mainDealerIfsc(e.getIfsc()).mainDealerMailID(e.getMailID())
+							.mainDealerManufacturerName(e.getManufacturerName()).mainDealerName(e.getDealerName())
+							.mainDealerPanNumber(e.getPanNumber()).mainDealerPaymentEligible(e.getPaymentEligible())
+							.mainDealerID(e.getMainDealerID()).addressDetails(e.getAddressDetails()).city(e.getCity())
+							.contactPersonMobile(e.getContactPersonMobile()).district(e.getDistrict())
+							.state(e.getState()).pinCode(e.getPinCode()).build();
+					maindealers.add(dealerDetailsDto);
+				});
+				return maindealers;
+			}
+			return new ArrayList<>();
+		} else {
+			List<MainDealer> allMainDealer = mainDealerRepository.findByStateAndDistrict(state, district);
+			if (!allMainDealer.isEmpty()) {
+				allMainDealer.stream().forEach(e -> {
+					MainDealerDetailsDto dealerDetailsDto = MainDealerDetailsDto.builder()
+							.mainDealerAccountHolderName(e.getAccountHolderName())
+							.mainDealerActivationData(e.getActivationData()).mainDealerExpireData(e.getExpiryDate())
+							.mainDealerAlternateContactNumber(e.getAlternateContactNumber())
+							.mainDealerBankAccNumber(e.getBankAccNumber())
+							.mainDealerBankBranchName(e.getBankBranchName()).mainDealerBankName(e.getBankName())
+							.mainDealerContactNumber(e.getContactNumber())
+							.mainDealerContactPersonName(e.getContactPersonName()).mainDealerGstNumber(e.getGstNumber())
+							.mainDealerIfsc(e.getIfsc()).mainDealerMailID(e.getMailID())
+							.mainDealerManufacturerName(e.getManufacturerName()).mainDealerName(e.getDealerName())
+							.mainDealerPanNumber(e.getPanNumber()).mainDealerPaymentEligible(e.getPaymentEligible())
+							.mainDealerID(e.getMainDealerID()).addressDetails(e.getAddressDetails()).city(e.getCity())
+							.contactPersonMobile(e.getContactPersonMobile()).district(e.getDistrict())
+							.state(e.getState()).pinCode(e.getPinCode()).build();
+					maindealers.add(dealerDetailsDto);
+				});
+				return maindealers;
+			}
+			return new ArrayList<>();
+		}
+	}
+
+	/**
+	 * @Api for Adding MainDealer
+	 */
+	@Override
+	public Boolean addMainDealer(MainDealerDetailsDto dealer) {
+		if (dealer != null) {
+
+			// Get State Abbreviation
+			Optional<StateAbbreviation> abbreviation = abbreviationRepository.findById(dealer.getState());
+			StateAbbreviation stateAbbreviation = abbreviation.get();
+			String state = stateAbbreviation.getStateAbbreviation();
+
+			// main dealer IdGeneratation
+			String id = "";
+			id += state + dealer.getMainDealerManufacturerName().subSequence(0, 3) + "-" + "____" + "-A01";
+			List<String> similarDealerId = new ArrayList<>();
+			similarDealerId = mainDealerRepository.getSimilarDealerId(id);
+			String incrementId = null;
+			if (!similarDealerId.isEmpty()) {
+				List<String> sortedId = similarDealerId.stream().sorted().collect(Collectors.toList());
+
+				String dealerid = sortedId.get(sortedId.size() - 1);
+				String dealercount = dealerid.substring(6, 10);
+				char[] charArray = dealercount.toCharArray();
+				int count = Integer.parseInt(dealercount);
+				count++;
+				String arr = "" + count;
+				int temp = charArray.length - 1;
+				for (int i = arr.length() - 1; i >= 0; i--) {
+					charArray[temp] = arr.charAt(i);
+					temp--;
+				}
+				String updatedCount = new String(charArray);
+				incrementId = state + dealer.getMainDealerManufacturerName().subSequence(0, 3) + "-" + updatedCount
+						+ "-A01";
+			} else {
+				incrementId = state + dealer.getMainDealerManufacturerName().subSequence(0, 3) + "-0001-A01";
+			}
+			// mainDealer Object Set
+			MainDealer mainDealer = MainDealer.builder().mainDealerID(incrementId).status("Pending")
+					.accountHolderName(dealer.getMainDealerAccountHolderName()).activationData(LocalDate.now())
+					.expiryDate(LocalDate.now().plusYears(3)).addressDetails(dealer.getAddressDetails())
+					.alternateContactNumber(dealer.getMainDealerAlternateContactNumber())
+					.bankAccNumber(dealer.getMainDealerBankAccNumber())
+					.bankBranchName(dealer.getMainDealerBankBranchName()).bankName(dealer.getMainDealerBankName())
+					.contactNumber(dealer.getMainDealerContactNumber())
+					.contactPersonMobile(dealer.getContactPersonMobile())
+					.contactPersonName(dealer.getMainDealerContactPersonName()).dealerName(dealer.getMainDealerName())
+					.delearType("MAIN").district(dealer.getDistrict()).city(dealer.getCity())
+					.ifsc(dealer.getMainDealerIfsc()).gstNumber(dealer.getMainDealerGstNumber())
+					.mailID(dealer.getMainDealerMailID()).manufacturerName(dealer.getMainDealerManufacturerName())
+					.state(dealer.getState()).pinCode(dealer.getPinCode()).paymentEligible("YES")
+					.panNumber(dealer.getMainDealerPanNumber()).build();
+			mainDealerRepository.save(mainDealer);
+			return true;
+		}
+		return false;
+	}
+
+	/**
+	 * @Api For Adding SubDealer
+	 */
+	@Override
+	public Boolean addSubDealers(String mainDealerID, SubDealerDetailsDto subDealerdto) {
+		// Get Main Dealer
+		Optional<MainDealer> dealer = mainDealerRepository.findById(mainDealerID);
+		if (dealer.isPresent()) {
+
+			MainDealer mainDealer = dealer.get(); // MainDealer Reference Set in SubDealer Object
+			//
+			String dealerID = mainDealer.getMainDealerID();
+			String maincount = dealerID.substring(6, 10);
+
+			// Get State Abbreviation
+			Optional<StateAbbreviation> abbreviation = abbreviationRepository.findById(mainDealer.getState());
+			StateAbbreviation stateAbbreviation = abbreviation.get();
+			String state = stateAbbreviation.getStateAbbreviation();
+
+			String id = "";
+			String incrementId = null;// locally Variable
+			id += state + mainDealer.getManufacturerName().subSequence(0, 3) + "-" + maincount + "-S" + "__";
+			List<String> similarDealerId = new ArrayList<>();
+			similarDealerId = subDealerRepository.getSimilarDealerId(id);
+			if (!similarDealerId.isEmpty()) {
+				List<String> sortedId = similarDealerId.stream().sorted().collect(Collectors.toList());
+				String priviousId = sortedId.get(sortedId.size() - 1);
+				String count = priviousId.substring(12);
+				char[] charArray = count.toCharArray();
+				int num = Integer.parseInt(count);
+				num++;
+				String arr = "" + num;
+				int temp = charArray.length - 1;
+				for (int i = arr.length() - 1; i >= 0; i--) {
+					charArray[temp] = arr.charAt(i);
+					temp--;
+				}
+				String updatedcount = new String(charArray);
+				incrementId = state + mainDealer.getManufacturerName().subSequence(0, 3) + "-" + maincount + "-S"
+						+ updatedcount;
+			} else {
+				incrementId = state + mainDealer.getManufacturerName().subSequence(0, 3) + "-" + maincount + "-S01";
+			}
+			// Seating SubDealer
+			SubDealer subDealer = SubDealer.builder().subDealerID(incrementId)
+					.accountHolderName(subDealerdto.getSubDealerAccountHolderName()).activationData(LocalDate.now())
+					.expiryDate(LocalDate.now().plusYears(3)).status("Pending")
+					.addressDetails(subDealerdto.getAddressDetails())
+					.alternateContactNumber(subDealerdto.getSubDealerAlternateContactNumber())
+					.bankAccNumber(subDealerdto.getSubDealerBankAccNumber())
+					.bankName(subDealerdto.getSubDealerBankName())
+					.bankBranchName(subDealerdto.getSubDealerBankBranchName()).city(subDealerdto.getCity())
+					.contactNumber(subDealerdto.getSubDealerContactNumber())
+					.contactPersonMobile(subDealerdto.getContactPersonMobile())
+					.contactPersonName(subDealerdto.getSubDealerContactPersonName())
+					.dealerName(subDealerdto.getSubDealerName()).delearType("SUB").district(mainDealer.getDistrict())
+					.gstNumber(subDealerdto.getSubDealerGstNumber()).ifsc(subDealerdto.getSubDealerIfsc())
+					.mailID(subDealerdto.getSubDealerMailID()).mainDealers(mainDealer)
+					.manufacturerName(subDealerdto.getSubDealerManufacturerName())
+					.panNumber(subDealerdto.getSubDealerPanNumber()).paymentEligible("YSE")
+					.pinCode(subDealerdto.getPinCode()).state(mainDealer.getState()).build();
+
+			subDealerRepository.save(subDealer);
+			return true;
+		}
+		return false;
+	}
+
+	@Override
+	public Boolean editMainDealer(String mainDealerId, MainDealerDetailsDto mainDetailsDto) {
+		if (mainDetailsDto != null) {
+			Optional<MainDealer> dealer = mainDealerRepository.findById(mainDealerId);
+			if (dealer.isPresent()) {
+				MainDealer mainDealer = dealer.get();
+				MainDealer newMainDealer = MainDealer.builder().status("Updated")
+						.accountHolderName(mainDetailsDto.getMainDealerAccountHolderName())
+						.activationData(mainDetailsDto.getMainDealerActivationData())
+						.expiryDate(mainDetailsDto.getMainDealerActivationData().plusYears(3))
+						.alternateContactNumber(mainDetailsDto.getMainDealerAlternateContactNumber())
+						.bankAccNumber(mainDetailsDto.getMainDealerBankAccNumber())
+						.bankBranchName(mainDetailsDto.getMainDealerBankBranchName())
+						.bankName(mainDetailsDto.getMainDealerBankName())
+						.contactNumber(mainDetailsDto.getMainDealerContactNumber())
+						.contactPersonName(mainDetailsDto.getMainDealerContactPersonName())
+						.dealerName(mainDetailsDto.getMainDealerName())
+						.gstNumber(mainDetailsDto.getMainDealerGstNumber()).ifsc(mainDetailsDto.getMainDealerIfsc())
+						.mailID(mainDetailsDto.getMainDealerMailID())
+						.manufacturerName(mainDetailsDto.getMainDealerManufacturerName())
+						.panNumber(mainDetailsDto.getMainDealerPanNumber()).paymentEligible("YES")
+						.addressDetails(mainDetailsDto.getAddressDetails()).state(mainDetailsDto.getState())
+						.district(mainDetailsDto.getDistrict()).pinCode(mainDetailsDto.getPinCode())
+						.contactPersonMobile(mainDetailsDto.getContactPersonMobile()).build();
+				BeanUtils.copyProperties(newMainDealer, mainDealer); // Hear Id updated to Zero (---v)
+				mainDealer.setMainDealerID(mainDealerId); // Seating original Id {Because it will Be zero }
+				mainDealerRepository.save(mainDealer);
+				return Boolean.TRUE;
+			}
+		}
+		return Boolean.FALSE;
+	}
+
+	@Override
+	public Boolean editSubDealer(String subDealerId, SubDealerDetailsDto subDetailsDto) {
+		if (subDetailsDto != null) {
+			Optional<SubDealer> dealer = subDealerRepository.findById(subDealerId);
+			if (dealer.isPresent()) {
+				SubDealer subDealer = dealer.get();
+
+				MainDealer mainDealer = subDealer.getMainDealers();
+
+				SubDealer newSubDealer = SubDealer.builder().status("Updated")
+						.accountHolderName(subDetailsDto.getSubDealerAccountHolderName())
+						.activationData(subDetailsDto.getSubDealerActivationData())
+						.expiryDate(subDetailsDto.getSubDealerActivationData().plusYears(3))
+						.alternateContactNumber(subDetailsDto.getSubDealerAlternateContactNumber())
+						.bankAccNumber(subDetailsDto.getSubDealerBankAccNumber())
+						.bankBranchName(subDetailsDto.getSubDealerBankBranchName())
+						.bankName(subDetailsDto.getSubDealerBankName())
+						.contactNumber(subDetailsDto.getSubDealerContactNumber())
+						.contactPersonName(subDetailsDto.getSubDealerContactPersonName())
+						.dealerName(subDetailsDto.getSubDealerName()).gstNumber(subDetailsDto.getSubDealerGstNumber())
+						.ifsc(subDetailsDto.getSubDealerIfsc()).mailID(subDetailsDto.getSubDealerMailID())
+						.manufacturerName(subDetailsDto.getSubDealerManufacturerName())
+						.panNumber(subDetailsDto.getSubDealerPanNumber()).paymentEligible("YES").mainDealers(mainDealer)
+						.contactPersonMobile(subDetailsDto.getContactPersonMobile()).state(subDetailsDto.getState())
+						.city(subDetailsDto.getCity()).district(subDetailsDto.getDistrict())
+						.pinCode(subDetailsDto.getPinCode()).addressDetails(subDetailsDto.getAddressDetails()).build();
+				BeanUtils.copyProperties(newSubDealer, subDealer);// Hear Id updated to null
+				subDealer.setSubDealerID(subDealerId);
+				subDealerRepository.save(subDealer);// save Update Sub_Dealer
+				return Boolean.TRUE;
+			}
+		}
+		return Boolean.FALSE;
+	}
+
+	@Override
+	public List<String> getStates() {
+		return mainDealerRepository.findAll().stream().map(e -> e.getState()).distinct().filter(e -> e != null)
+				.toList();
+	}
+
+	@Override
+	public List<String> getDistricts() {
+		return mainDealerRepository.findAll().stream().map(e -> e.getDistrict()).distinct().filter(e -> e != null)
+				.toList();
+	}
+
+	@Override
+	public List<String> getOemBaseOnState(String state) {
+		return vehicalPriceRepository.findByState(state);
+	}
+
+	@Override
+	public List<MainDealerDetailsDto> getExcelFile() {
+		List<MainDealer> allDealer = new ArrayList<>();
+		allDealer = mainDealerRepository.findAll();
+		List<MainDealerDetailsDto> allMainDealerdto = new ArrayList<>();
+		if (!allDealer.isEmpty()) {
+
+			allDealer.stream().filter(mainstatus -> mainstatus.getState().equalsIgnoreCase("Approved")).forEach(e -> {
+
+				List<SubDealer> allSubDealer = new ArrayList<>();
+				List<SubDealerDetailsDto> subDealerDtos = new ArrayList<>();
+
+				allSubDealer = e.getSubDealer();
+
+				if (!allSubDealer.isEmpty()) {
+					allSubDealer.stream().filter(substatus -> substatus.getStatus().equalsIgnoreCase("Approved"))
+							.forEach(data -> {
+								SubDealerDetailsDto subDealerDto = SubDealerDetailsDto.builder()
+										.subDealerAccountHolderName(data.getAccountHolderName())
+										.subDealerActivationData(e.getActivationData())
+										.subDealerExpireData(e.getExpiryDate())
+										.subDealerAlternateContactNumber(data.getAlternateContactNumber())
+										.subDealerBankAccNumber(data.getBankAccNumber())
+										.subDealerBankBranchName(data.getBankBranchName())
+										.subDealerBankName(data.getBankName())
+										.subDealerContactNumber(data.getContactNumber())
+										.subDealerContactPersonName(data.getContactPersonName())
+										.subDealerMailID(data.getMailID()).subDealerName(data.getDealerName())
+										.subDealerGstNumber(data.getGstNumber()).subDealerID(data.getSubDealerID())
+										.subDealerIfsc(data.getIfsc())
+										.subDealerManufacturerName(data.getManufacturerName())
+										.subDealerPanNumber(data.getPanNumber())
+										.subDealerPaymentEligible(data.getPaymentEligible())
+										.addressDetails(data.getAddressDetails()).city(data.getCity())
+										.contactPersonMobile(data.getContactPersonMobile()).district(data.getDistrict())
+										.pinCode(data.getPinCode()).state(data.getState())
+										.mainDealer(data.getMainDealers()).build();
+								subDealerDtos.add(subDealerDto);
+							});
+				}
+				MainDealerDetailsDto dealerDetailsDto = MainDealerDetailsDto.builder()
+						.mainDealerAccountHolderName(e.getAccountHolderName())
+						.mainDealerActivationData(e.getActivationData()).mainDealerExpireData(e.getExpiryDate())
+						.mainDealerAlternateContactNumber(e.getAlternateContactNumber())
+						.mainDealerBankAccNumber(e.getBankAccNumber()).mainDealerBankBranchName(e.getBankBranchName())
+						.mainDealerBankName(e.getBankName()).mainDealerContactNumber(e.getContactNumber())
+						.mainDealerContactPersonName(e.getContactPersonName()).mainDealerGstNumber(e.getGstNumber())
+						.mainDealerIfsc(e.getIfsc()).mainDealerMailID(e.getMailID())
+						.mainDealerManufacturerName(e.getManufacturerName()).mainDealerName(e.getDealerName())
+						.mainDealerPanNumber(e.getPanNumber()).mainDealerPaymentEligible(e.getPaymentEligible())
+						.mainDealerID(e.getMainDealerID()).addressDetails(e.getAddressDetails()).city(e.getCity())
+						.contactPersonMobile(e.getContactPersonMobile()).district(e.getDistrict()).state(e.getState())
+						.pinCode(e.getPinCode()).subDealerDetailsDtos(subDealerDtos).build();
+				allMainDealerdto.add(dealerDetailsDto);
+			});
+			return allMainDealerdto;
+		}
+		return allMainDealerdto;
+	}
+
+	// ===============================Variants================================================
+
+	@Override
+	public List<VehicleVariantDto> mainVariants(String mainDealerID) {
+		// Create List For Return Statement
+		List<VehicleVariantDto> vehicleVariantDto = new ArrayList<VehicleVariantDto>();
+
+		Optional<MainDealer> dealer = mainDealerRepository.findById(mainDealerID);
+		if (dealer.isPresent()) {
+			String manufacturerName = dealer.get().getManufacturerName();
+			List<VehicalPrice> allVeriants = vehicalPriceRepository.findByOemVehicalOem(manufacturerName);
+			if (!allVeriants.isEmpty()) {
+				allVeriants.stream().filter(e -> e.getState().equalsIgnoreCase(dealer.get().getState())).forEach(e -> {
+					VehicleVariantDto vehicleVariant = new VehicleVariantDto();
+					vehicleVariant.setVariantID(e.getVehicalPriceID());
+					vehicleVariant.setVariantName(e.getType().getVehicalvariantName());
+					List<VehicalPrice> veriants = dealer.get().getVeriants();
+					if (!veriants.contains(e))
+						vehicleVariantDto.add(vehicleVariant);
+				});
+			}
+			return vehicleVariantDto;
+		}
+		return vehicleVariantDto;
+	}
+
+	@Override
+	public List<VehicleVariantDto> avaliableMainVariants(String mainDealerID) {
+		MainDealer mainDealer = mainDealerRepository.findById(mainDealerID).get();
+		List<VehicalPrice> veriants = mainDealer.getVeriants();
+		ArrayList<VehicleVariantDto> avaliableVariants = new ArrayList<VehicleVariantDto>();
+		if (!veriants.isEmpty()) {
+			veriants.stream().forEach(e -> {
+				VehicleVariantDto vehicleVariantDto = new VehicleVariantDto();
+				vehicleVariantDto.setVariantID(e.getVehicalPriceID());
+				vehicleVariantDto.setVariantName(e.getType().getVehicalvariantName());
+				avaliableVariants.add(vehicleVariantDto);
+			});
+		}
+		return avaliableVariants;
+	}
+
+	@Override
+	public boolean addVeriantsMian(String mainDealerID, List<VehicleVariantDto> variants) {
+		Optional<MainDealer> dealer = mainDealerRepository.findById(mainDealerID);
+		if (dealer.isPresent()) {
+			MainDealer mainDealer = dealer.get();
+			List<VehicalPrice> varientsList = mainDealer.getVeriants();
+			variants.stream().forEach(e -> {
+				Optional<VehicalPrice> optionalData = vehicalPriceRepository.findById(e.getVariantID());
+				if (optionalData.isPresent()) {
+					VehicalPrice vehicalPriceData = optionalData.get();
+					if (!varientsList.contains(vehicalPriceData))
+						varientsList.add(vehicalPriceData);
+				}
+			});
+//			List<VehicalPrice> collect = varientsList.stream().distinct().collect(Collectors.toList());)
+			mainDealer.setVeriants(varientsList);
+			mainDealerRepository.save(mainDealer);
+			return Boolean.TRUE;
+		}
+		return Boolean.FALSE;
+	}
+
+	@Override
+	public Boolean removeMainVariant(String mainDealerID, List<VehicleVariantDto> variants) {
+		MainDealer mainDealer = mainDealerRepository.findById(mainDealerID).get();
+		List<VehicalPrice> veriants = mainDealer.getVeriants();
+		variants.stream().forEach(e -> {
+			Optional<VehicalPrice> optionalData = vehicalPriceRepository.findById(e.getVariantID());
+			if (optionalData.isPresent()) {
+				VehicalPrice vehicalPrice = optionalData.get();
+				veriants.remove(vehicalPrice);
+			}
+		});
+		mainDealer.setVeriants(veriants);
+		MainDealer responce = mainDealerRepository.save(mainDealer);
+		if (responce != null)
+			return Boolean.TRUE;
+		return Boolean.FALSE;
+	}
+
+	@Override
+	public List<VehicleVariantDto> subVariants(String subDealerID) {
+		// Create Empty DtoList For Return
+		ArrayList<VehicleVariantDto> varients = new ArrayList<VehicleVariantDto>();
+
+		// Get Sub_Dealer BY SubDealerID
+		SubDealer subDealer = subDealerRepository.findById(subDealerID).get();
+
+		// Get SubDealer Existing Variants
+		List<VehicalPrice> subDealerVeriants = subDealer.getVehicleVeriants();
+
+		MainDealer mainDealer = mainDealerRepository.findById(subDealer.getMainDealers().getMainDealerID()).get();
+
+		// Get Main Dealer Existing Variants
+		List<VehicalPrice> veriants = mainDealer.getVeriants();
+
+		veriants.stream().forEach(e -> {
+			if (!subDealerVeriants.contains(e)) {
+				VehicleVariantDto vehicleVariantDto = new VehicleVariantDto();
+				vehicleVariantDto.setVariantID(e.getVehicalPriceID());
+				vehicleVariantDto.setVariantName(e.getType().getVehicalvariantName());
+				varients.add(vehicleVariantDto);
+			}
+		});
+		return varients;
+	}
+
+	@Override
+	public List<VehicleVariantDto> avaliableSubVariants(String subDealerID) {
+		SubDealer subDealer = subDealerRepository.findById(subDealerID).get();
+		List<VehicalPrice> veriants = subDealer.getVehicleVeriants();
+		ArrayList<VehicleVariantDto> avaliableVariants = new ArrayList<VehicleVariantDto>();
+		if (!veriants.isEmpty()) {
+			veriants.stream().forEach(e -> {
+				VehicleVariantDto vehicleVariantDto = new VehicleVariantDto();
+				vehicleVariantDto.setVariantID(e.getVehicalPriceID());
+				vehicleVariantDto.setVariantName(e.getType().getVehicalvariantName());
+				avaliableVariants.add(vehicleVariantDto);
+			});
+		}
+		return avaliableVariants;
+	}
+
+	@Override
+	public boolean addVariantSub(String subDealerID, List<VehicleVariantDto> variants) {
+		// Get SubDealer By SubDealerID
+		SubDealer subDealer = subDealerRepository.findById(subDealerID).get();
+		List<VehicalPrice> subVeriants = subDealer.getVehicleVeriants();
+		variants.stream().forEach(e -> {
+			VehicalPrice vehicalPriceData = vehicalPriceRepository.findById(e.getVariantID()).get();
+			if (!subVeriants.contains(vehicalPriceData))
+				subVeriants.add(vehicalPriceData);
+		});
+		subDealer.setVehicleVeriants(subVeriants);
+		subDealerRepository.save(subDealer);
+		return Boolean.TRUE;
+	}
+
+	@Override
+	public Boolean removeSubVariant(String subDealerID, List<VehicleVariantDto> variants) {
+		SubDealer subDealer = subDealerRepository.findById(subDealerID).get();
+		List<VehicalPrice> vehicleVeriants = subDealer.getVehicleVeriants();
+		variants.stream().forEach(e -> {
+			Optional<VehicalPrice> optionalData = vehicalPriceRepository.findById(e.getVariantID());
+			if (optionalData.isPresent()) {
+				VehicalPrice vehicalPrice = optionalData.get();
+				vehicleVeriants.remove(vehicalPrice);
+			}
+		});
+		subDealer.setVehicleVeriants(vehicleVeriants);
+		SubDealer response = subDealerRepository.save(subDealer);
+		if (response != null)
+			return Boolean.TRUE;
+
+		return Boolean.FALSE;
+	}
+
+//===============================Branches================================================
+	@Override
+	public String addMainBranches(String mainDealerID, List<String> branchIDs) {
+		// Get Main Dealer By ID
+		MainDealer mainDealer = mainDealerRepository.findById(mainDealerID).get();
+//		List<Branch> mainBranches = mainDealer.getMainBranches();
+//		System.out.println(mainBranches);
+		if (!branchIDs.isEmpty()) {
+			branchIDs.stream().forEach(e -> {
+				Branch branch = branchRepository.findById(e).get();
+//				if (!mainBranches.contains(branch))
+//					mainBranches.add(branch);
+				branch.setMainDealer(mainDealer);
+				branchRepository.save(branch);
+			});
+//			System.out.println(mainBranches);
+//			mainDealerRepository.save(mainDealer);
+//			mainBranches.stream().forEach(e->System.out.println(e));
+			return "Sucessfully Added";
+		}
+		return "Not Added";
+	}
+
+	@Override
+	public Boolean removeMainBranches(String mainDealerID, List<String> branchIDs) {
+		MainDealer mainDealer = mainDealerRepository.findById(mainDealerID).get();
+		List<Branch> mainBranches = mainDealer.getMainBranches();
+		if (!branchIDs.isEmpty()) {
+			branchIDs.stream().forEach(e -> {
+				Branch branch = branchRepository.findById(e).get();
+				if (mainBranches.contains(branch)) {
+					branch.setMainDealer(null);
+					branchRepository.save(branch);
+//					mainBranches.remove(branch);
+				}
+			});
+//			mainDealer.setMainBranches(mainBranches);
+//			mainDealerRepository.save(mainDealer);
+			return Boolean.TRUE;
+		}
+		return Boolean.FALSE;
+	}
+
+	@Override
+	public List<String> showMainBranches(String mainDealerID) {
+		List<String> notContainMainBranches = new ArrayList<>();
+		MainDealer mainDealer = mainDealerRepository.findById(mainDealerID).get();
+		List<Branch> allBranches = branchRepository.findByState(mainDealer.getState());
+		List<Branch> mainBranches = mainDealer.getMainBranches();
+		if (!allBranches.isEmpty()) {
+			allBranches.stream().forEach(e -> {
+				if (!mainBranches.contains(e)) {
+					notContainMainBranches.add(e.getGLBranchT24ID());
+				}
+			});
+		}
+		return notContainMainBranches;
+	}
+
+	@Override
+	public List<String> showMainBranches(String mainDealerID, String region, String area) {
+		List<String> notContainMainBranches = new ArrayList<>();
+		MainDealer mainDealer = mainDealerRepository.findById(mainDealerID).get();
+		System.err.println(mainDealer.getState());
+		List<Branch> allBranches = branchRepository.findByState(mainDealer.getState());
+		List<Branch> mainBranches = mainDealer.getMainBranches();
+
+		/** e.getMainDealer==null */ // To Get Non Use Dealer
+
+		if (region.equalsIgnoreCase("null") & area.equalsIgnoreCase("null")) {
+			allBranches.stream().filter(e -> e.getMainDealer() == null).forEach(e -> {
+				if (!mainBranches.contains(e)) {
+					notContainMainBranches.add(e.getGLBranchT24ID());
+				}
+			});
+			return notContainMainBranches;
+		} else if (!region.equalsIgnoreCase("null") & area.equalsIgnoreCase("null")) {
+			allBranches.stream().filter(e -> e.getRegion().equalsIgnoreCase(region) & e.getMainDealer() == null)
+					.forEach(e -> {
+						if (!mainBranches.contains(e)) {
+							notContainMainBranches.add(e.getGLBranchT24ID());
+						}
+					});
+			return notContainMainBranches;
+		} else {// (!region.equalsIgnoreCase("null")&& !area.equalsIgnoreCase("null"))
+			allBranches.stream().filter(e -> e.getArea().equalsIgnoreCase(area)
+					&& e.getRegion().equalsIgnoreCase(region) & e.getMainDealer() == null).forEach(e -> {
+						if (!mainBranches.contains(e)) {
+							notContainMainBranches.add(e.getGLBranchT24ID());
+						}
+					});
+			return notContainMainBranches;
+		}
+	}
+
+	@Override
+	public List<String> showAvaliableMainBranches(String mainDealerID) {
+		List<String> branchIDs = new ArrayList<>();
+		MainDealer mainDealer = mainDealerRepository.findById(mainDealerID).get();
+		List<Branch> mainBranches = mainDealer.getMainBranches();
+		mainBranches.stream().forEach(e -> {
+			branchIDs.add(e.getGLBranchT24ID());
+		});
+		return branchIDs;
+	}
+
+	// ===========================
+
+	@Override
+	public List<String> showSubBranches(String subDealerID, String region, String area) {
+		List<String> notContainBranches = new ArrayList<>();
+		SubDealer subDealer = subDealerRepository.findById(subDealerID).get();
+		List<Branch> subBranches = subDealer.getSubBranches();
+		List<Branch> allbranches = branchRepository.findByState(subDealer.getState());
+
+		if (region.equalsIgnoreCase("null") && region.equalsIgnoreCase("null")) {
+			allbranches.stream().filter(e -> e.getSubDealer() == null).forEach(e -> {
+				if (!subBranches.contains(e)) {
+					notContainBranches.add(e.getGLBranchT24ID());
+				}
+			});
+			return notContainBranches;
+		} else if (!region.equalsIgnoreCase("null") && region.equalsIgnoreCase("null")) {
+			allbranches.stream().filter(e -> e.getSubDealer() == null && e.getRegion().equalsIgnoreCase(region))
+					.forEach(e -> {
+						if (!subBranches.contains(e)) {
+							notContainBranches.add(e.getGLBranchT24ID());
+						}
+					});
+			return notContainBranches;
+		} else {
+			allbranches.stream().filter(e -> e.getSubDealer() == null && e.getArea().equalsIgnoreCase(area)
+					&& e.getRegion().equalsIgnoreCase(region)).forEach(e -> {
+						if (!subBranches.contains(e)) {
+							notContainBranches.add(e.getGLBranchT24ID());
+						}
+					});
+			return notContainBranches;
+		}
+	}
+
+	@Override
+	public List<String> showAvaliableSubBranches(String subDealerID) {
+		List<String> containBranches = new ArrayList<>();
+		List<Branch> subBranches = subDealerRepository.findById(subDealerID).get().getSubBranches();
+		subBranches.stream().forEach(e -> {
+			containBranches.add(e.getGLBranchT24ID());
+		});
+		return containBranches;
+	}
+
+	@Override
+	public String addSubBranches(String subDealerID, List<String> branchIDs) {
+		SubDealer subDealer = subDealerRepository.findById(subDealerID).get();
+		List<Branch> subBranches = subDealer.getSubBranches();
+		if (!branchIDs.isEmpty()) {
+			branchIDs.stream().forEach(e -> {
+				Branch branch = branchRepository.findById(e).get();
+				if (!subBranches.contains(branch)) {
+//					subBranches.add(branch);
+					branch.setSubDealer(subDealer);
+					branchRepository.save(branch);	
+				}
+			});
+//			subDealerRepository.save(subDealer);
+			return "Sucessfully Added";
+		}
+		return "Not Added Sucessfully";
+	}
+
+	@Override
+	public Boolean removeSubBranches(String subDealerID, List<String> branchIDs) {
+		SubDealer subDealer = subDealerRepository.findById(subDealerID).get();
+		List<Branch> subBranches = subDealer.getSubBranches();
+		if (!branchIDs.isEmpty()) {
+			branchIDs.stream().forEach(e -> {
+				Branch branch = branchRepository.findById(e).get();
+				if (subBranches.contains(branch)) {
+					subBranches.remove(branch);
+				}
+			});
+			subDealerRepository.save(subDealer);
+			return Boolean.TRUE;
+		}
+		return Boolean.FALSE;
+	}
+
+}

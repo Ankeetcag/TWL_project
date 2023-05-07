@@ -1,6 +1,5 @@
 package com.cag.twowheeler.service.serviceimpl;
 
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -86,7 +85,7 @@ public class TwoWheelerDealerServiceImpl implements TwoWheelerDealerService {
 
 				SubDealerDetailsDto subDealerDto = SubDealerDetailsDto.builder()
 						.subDealerAccountHolderName(a.getAccountHolderName())
-						.subDealerActivationStatus(a.getActivatioinStatus())
+						.subDealerActivationStatus(a.getActivatioinStatus()).subDealerStatus(a.getStatus())
 						.subDealerActivationData(a.getActivationData()).subDealerExpireData(a.getExpiryDate())
 						.subDealerAlternateContactNumber(a.getAlternateContactNumber())
 						.subDealerBankAccNumber(a.getBankAccNumber()).subDealerBankBranchName(a.getBankBranchName())
@@ -242,7 +241,7 @@ public class TwoWheelerDealerServiceImpl implements TwoWheelerDealerService {
 					.delearType("MAIN").district(dealer.getDistrict()).city(dealer.getCity())
 					.ifsc(dealer.getMainDealerIfsc()).gstNumber(dealer.getMainDealerGstNumber())
 					.mailID(dealer.getMainDealerMailID()).manufacturerName(dealer.getMainDealerManufacturerName())
-					.state(dealer.getState()).pinCode(dealer.getPinCode())
+					.state(dealer.getState()).pinCode(dealer.getPinCode()).idStatus("OK")
 					.paniniCheck(dealer.getMainDealerPaniniCheck()).panNumber(dealer.getMainDealerPanNumber()).build();
 			mainDealerRepository.save(mainDealer);
 			return true;
@@ -312,7 +311,7 @@ public class TwoWheelerDealerServiceImpl implements TwoWheelerDealerService {
 					.mailID(subDealerdto.getSubDealerMailID()).mainDealers(mainDealer)
 					.manufacturerName(subDealerdto.getSubDealerManufacturerName())
 					.panNumber(subDealerdto.getSubDealerPanNumber()).paniniCheck(subDealerdto.getSubDealerPaniniCheck())
-					.pinCode(subDealerdto.getPinCode()).state(mainDealer.getState()).build();
+					.pinCode(subDealerdto.getPinCode()).state(mainDealer.getState()).idStatus("OK").build();
 
 			subDealerRepository.save(subDealer);
 			return true;

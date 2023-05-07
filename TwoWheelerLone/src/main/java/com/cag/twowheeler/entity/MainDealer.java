@@ -14,6 +14,7 @@ import javax.persistence.OneToMany;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -91,13 +92,26 @@ public class MainDealer {
 	@Column(name = "ExpiryDate")
 	private LocalDate expiryDate;
 
-//	@Column(name = "UpdaterUserId")
-//	private String updaterUserId; // newely Added
+	
+	@Column(name = "MakerUserID")
+	private String makerUserID;
+	
+	@Column(name = "MakerDate")
+	private LocalDate makerDate;
+	
+	@Column(name = "UpdaterUserID")
+	private String updaterUserID; 
 
-//	@Column(name = "UpdatedDate")
-//	private String updatedDate; // newely Added
+	@Column(name = "UpdatedDate")
+	private String updatedDate; 
+	
+	@Column(name = "CheckerID")
+	private String checkerUserID;
+	
+	@Column(name = "CheckerDate")
+	private LocalDate checkerDate;
 
-	@Column(name = "State") // all address
+	@Column(name = "State")
 	private String state;
 
 	@Column(name = "District")

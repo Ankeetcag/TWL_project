@@ -1,0 +1,145 @@
+package com.cag.twowheeler.controller;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.cag.twowheeler.dto.MainDealerDetailsDto;
+import com.cag.twowheeler.dto.SubDealerDetailsDto;
+import com.cag.twowheeler.responce.responce;
+import com.cag.twowheeler.service.TwoWheelerDealerService;
+
+/**
+ * @author Ankeet
+ */
+@RestController
+public class TwoWheelerDealerController {
+
+	@Autowired
+	TwoWheelerDealerService dealerService;
+
+	@PostMapping("/addsubdealer")
+	public ResponseEntity<responce> addSubDealer(@RequestParam String mainDealerId,
+			@RequestBody SubDealerDetailsDto subDealerDetailsDto) {
+		Boolean check = dealerService.addSubDealers(mainDealerId, subDealerDetailsDto);
+		if (check)
+			return ResponseEntity.status(HttpStatus.OK).body(responce.builder().error("False").data("--NA--")
+					.message("Sub Dealers Data Add Sucessfully").build());
+
+		return ResponseEntity.status(HttpStatus.NOT_MODIFIED).body(responce.builder().error("True")
+				.data("Please Mention Maindealer for Sub Dealer").message("Sub Dealers Data Not Added ").build());
+	}
+
+	@PostMapping("/addmaindealer")
+	public ResponseEntity<responce> addMainDealer(@RequestBody MainDealerDetailsDto DealerDetailsDto) {
+		Boolean check = dealerService.addMainDealer(DealerDetailsDto);
+		if (check)
+			return ResponseEntity.status(HttpStatus.OK).body(responce.builder().error("False").data("--NA--")
+					.message("Main Dealers Data Add Sucessfully").build());
+
+		return ResponseEntity.status(HttpStatus.NOT_MODIFIED)
+				.body(responce.builder().error("True").data("--NA--").message("Main Dealers Data Not Add ").build());
+	}
+
+	/**
+	 * @param state
+	 * @param district Get Sub Dealer By Specific State And/OR District
+	 * 
+	 */
+	@GetMapping("/searchdealer")
+	public ResponseEntity<responce> getMainDealerByState(@RequestParam String state, @RequestParam String district) {
+		if (state.equalsIgnoreCase("null"))
+			state = null;
+		if (district.equalsIgnoreCase("null"))
+			district = null;
+		List<MainDealerDetailsDto> dealersDetails = dealerService.getMainDealer(state, district);
+		if (!dealersDetails.isEmpty())
+			return ResponseEntity.status(HttpStatus.OK)
+					.body(responce.builder().error("False").data(dealersDetails).message("all dealers data").build());
+
+		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responce.builder().data("NO Dealers Data Found")
+				.error("True").message("No Sub Dealer Present").build());
+
+	}
+
+	/**
+	 * @param mainDealerId
+	 * @Get All SubDealer Base on MainDealer
+	 */
+	@GetMapping("/getsubdealers")
+	public ResponseEntity<responce> getSubDealers(@RequestParam String mainDealerId) {
+		List<SubDealerDetailsDto> allSubDealerDetails = dealerService.getSubDealerDetails(mainDealerId);
+		if (allSubDealerDetails.isEmpty())
+			return ResponseEntity.status(HttpStatus.NOT_FOUND)
+					.body(responce.builder().error("True").data("--NA--").message("No Sub Dealer Present").build());
+
+		return ResponseEntity.status(HttpStatus.OK).body(responce.builder().error("False").data(allSubDealerDetails)
+				.message("Sub Dealer Fetch sucessfully").build());
+	}
+
+	@GetMapping("/getmaindealers")
+	public ResponseEntity<responce> getMainDealers() {
+
+		List<MainDealerDetailsDto> dealersDetails = dealerService.getMainDealersDetails();
+		if (dealersDetails.size() != 0)
+			return ResponseEntity.status(HttpStatus.OK)
+					.body(responce.builder().error("False").data(dealersDetails).message("all dealers data").build());
+
+		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responce.builder().data("NO Dealers Data Found")
+				.error("True").message("No Sub Dealer Present").build());
+	}
+
+	@PutMapping("/editmaindealer")
+	public ResponseEntity<responce> editMainDealer(@RequestParam String mainDealerId,
+			@RequestBody MainDealerDetailsDto mainDetailsDto) {
+		Boolean check = dealerService.editMainDealer(mainDealerId, mainDetailsDto);
+		if (check)
+			return ResponseEntity.status(HttpStatus.OK).body(responce.builder().error("False").data("--NA--")
+					.message("Main Dealers Data Edit Sucessfully").build());
+
+		return ResponseEntity.status(HttpStatus.NOT_MODIFIED)
+				.body(responce.builder().error("True").data("--NA--").message("Main Dealers Data Not Edit ").build());
+	}
+
+	@PutMapping("/editsubdealer")
+	public ResponseEntity<responce> editSubDealer(@RequestParam String subDealerId,
+			@RequestBody SubDealerDetailsDto subDetailsDto) {
+		Boolean check = dealerService.editSubDealer(subDealerId, subDetailsDto);
+		if (check)
+			return ResponseEntity.status(HttpStatus.OK).body(responce.builder().error("False").data("--NA--")
+					.message("Sub Dealers Data Edit Sucessfully").build());
+
+		return ResponseEntity.status(HttpStatus.NOT_MODIFIED)
+				.body(responce.builder().error("True").data("--NA--").message("Sub Dealers Data Not Edit ").build());
+	}
+
+	@GetMapping("/statedropdown")
+	public ResponseEntity<responce> dropDownState() {
+		List<String> states = dealerService.getStates();
+		if (!states.isEmpty())
+			return ResponseEntity.status(HttpStatus.OK).body(
+					responce.builder().error("false").data(states).message("All States Fetch Sucessfully").build());
+
+		return ResponseEntity.status(HttpStatus.NOT_FOUND)
+				.body(responce.builder().error("false").data("--NA--").message("State Not Preseant").build());
+	}
+
+	@GetMapping("/districtdropdown")
+	public ResponseEntity<responce> dropDownDistrict() {
+		List<String> districts = dealerService.getDistricts();
+		if (!districts.isEmpty())
+			return ResponseEntity.status(HttpStatus.OK).body(responce.builder().error("false").data(districts)
+					.message("All districts Fetch Sucessfully").build());
+
+		return ResponseEntity.status(HttpStatus.NOT_FOUND)
+				.body(responce.builder().error("false").data("--NA--").message("districts Not Preseant").build());
+	}
+}

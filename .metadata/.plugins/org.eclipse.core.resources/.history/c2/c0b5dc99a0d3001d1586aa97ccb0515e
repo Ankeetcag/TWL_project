@@ -1,0 +1,63 @@
+package com.cag.twowheeler.entity;
+
+import java.time.LocalDate;
+import java.util.List;
+
+import javax.persistence.CascadeType;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToOne;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
+
+
+@Entity
+@Getter
+@Setter
+@ToString
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
+public class SubDealer {
+	
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private long subDealerID;
+	private String dealerName;
+	private String manufacturerName;
+	private String dealerMailID;
+	private long contactNumber;
+	private long alternateContactNumber;
+	private String contactPersonName;
+	private String panNumber;
+	private String gstNumber;
+	private String bankName;
+	private String bankBranchName;
+	private long bankAccNumber;
+	private String ifsc;
+	private String accountHolderName;
+	private String status;
+	private String reviewStatus;
+	private boolean paymentEligible;
+	private String activationData;
+	
+	@ManyToOne
+	@JoinColumn(name = "MainDealerId")
+	private MainDealer mainDealers;
+	
+	@OneToOne(cascade = CascadeType.ALL)
+	@JoinColumn(name = "Address")
+	private DealerAddress address;
+	
+
+}

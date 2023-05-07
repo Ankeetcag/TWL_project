@@ -1,8 +1,8 @@
 package com.cag.twowheeler.controller;
 
 import java.io.IOException;
+import java.io.NotActiveException;
 import java.io.OutputStream;
-import java.util.List;
 import java.util.Optional;
 
 import javax.servlet.http.HttpServletRequest;
@@ -44,108 +44,85 @@ public class DocumentUploadController {
 		if (file != null) {
 			// LOGIC FOR CREATING DOCUMENTID BASE ON DEALEAR [EX:->PANCARD*KABAJ-0001-A01]
 			String documentID = "";
-			if (ID.substring(11).equalsIgnoreCase("A01")) {
-				MainDealer mainDealer = mainDealerRepository.findById(ID).get();
+			try {
+				if (ID.substring(11).equalsIgnoreCase("A01")) {
 
-				documentID = documentType + "*" + mainDealer.getMainDealerID();// ID Generated
-				Optional<Documents> optationalDocument = documentRepository.findById(documentID);
-				if (optationalDocument.isPresent()) {
-					Documents existDocument = optationalDocument.get();
-					Documents document = Documents.builder().DocumentID(documentID).fileName(file.getOriginalFilename())
-							.data(file.getBytes()).fileType(file.getContentType()).fileLength(file.getSize())
-							.mainDealer(mainDealer).build();
-					BeanUtils.copyProperties(document, existDocument);// copy all properties to original object!
-					documentRepository.save(existDocument);
+					MainDealer mainDealer = mainDealerRepository.findById(ID).get();
 
-					return ResponseEntity.status(HttpStatus.OK).body(responce.builder().data(existDocument.getData())
-							.error("FALSE").message("FILE UPLOADED..!").build());
+					documentID = documentType + "*" + mainDealer.getMainDealerID();// ID Generated
+					Optional<Documents> optationalDocument = documentRepository.findById(documentID);
+					if (optationalDocument.isPresent()) {
+						Documents existDocument = optationalDocument.get();
+						Documents document = Documents.builder().DocumentID(documentID)
+								.fileName(file.getOriginalFilename()).data(file.getBytes())
+								.fileType(file.getContentType()).fileLength(file.getSize()).mainDealer(mainDealer)
+								.build();
+						BeanUtils.copyProperties(document, existDocument);// copy all properties to original object!
+						documentRepository.save(existDocument);
+
+						return ResponseEntity.status(HttpStatus.OK).body(responce.builder()
+								.data(existDocument.getData()).error("FALSE").message("FILE UPLOADED..!").build());
+
+					} else {
+						Documents document = Documents.builder().DocumentID(documentID)
+								.fileName(file.getOriginalFilename()).data(file.getBytes())
+								.fileType(file.getContentType()).fileLength(file.getSize()).mainDealer(mainDealer)
+								.build();
+						System.out.println(file.getName());
+						documentRepository.save(document);
+
+						return ResponseEntity.status(HttpStatus.OK).body(responce.builder().data(document.getData())
+								.error("FALSE").message("FILE UPLOADED..!").build());
+					}
 
 				} else {
-					Documents document = Documents.builder().DocumentID(documentID).fileName(file.getOriginalFilename())
-							.data(file.getBytes()).fileType(file.getContentType()).fileLength(file.getSize())
-							.mainDealer(mainDealer).build();
-					System.out.println(file.getName());
-					documentRepository.save(document);
+					SubDealer subDealer = subDealerRepository.findById(ID).get();
+					String subDealerID = subDealer.getSubDealerID();
+					documentID = documentType + "*" + subDealerID;// ID Generated
 
-					return ResponseEntity.status(HttpStatus.OK).body(responce.builder().data(document.getData())
-							.error("FALSE").message("FILE UPLOADED..!").build());
+					Optional<Documents> optationalDocument = documentRepository.findById(documentID);
+					if (optationalDocument.isPresent()) {
+						Documents existDocument = optationalDocument.get();
+						Documents document = Documents.builder().DocumentID(documentID)
+								.fileName(file.getOriginalFilename()).data(file.getBytes())
+								.fileType(file.getContentType()).fileLength(file.getSize()).subDealer(subDealer)
+								.build();
+						BeanUtils.copyProperties(document, existDocument);// copy all properties to original object!
+						documentRepository.save(existDocument);
+
+						return ResponseEntity.status(HttpStatus.OK).body(responce.builder()
+								.data(existDocument.getData()).error("FALSE").message("FILE UPLOADED..!").build());
+					} else {
+						Documents document = Documents.builder().DocumentID(documentID)
+								.fileName(file.getOriginalFilename()).data(file.getBytes())
+								.fileType(file.getContentType()).fileLength(file.getSize()).subDealer(subDealer)
+								.build();
+						documentRepository.save(document);
+
+						return ResponseEntity.status(HttpStatus.OK).body(responce.builder().data(document.getData())
+								.error("FALSE").message("FILE UPLOADED..!").build());
+					}
 				}
-
-			} else {
-				SubDealer subDealer = subDealerRepository.findById(ID).get();
-				String subDealerID = subDealer.getSubDealerID();
-				documentID = documentType + "*" + subDealerID;// ID Generated
-
-				Optional<Documents> optationalDocument = documentRepository.findById(documentID);
-				if (optationalDocument.isPresent()) {
-					Documents existDocument = optationalDocument.get();
-					Documents document = Documents.builder().DocumentID(documentID).fileName(file.getOriginalFilename())
-							.data(file.getBytes()).fileType(file.getContentType()).fileLength(file.getSize())
-							.subDealer(subDealer).build();
-					BeanUtils.copyProperties(document, existDocument);// copy all properties to original object!
-					documentRepository.save(existDocument);
-
-					return ResponseEntity.status(HttpStatus.OK).body(responce.builder().data(existDocument.getData())
-							.error("FALSE").message("FILE UPLOADED..!").build());
-				} else {
-					Documents document = Documents.builder().DocumentID(documentID).fileName(file.getOriginalFilename())
-							.data(file.getBytes()).fileType(file.getContentType()).fileLength(file.getSize())
-							.subDealer(subDealer).build();
-					documentRepository.save(document);
-
-					return ResponseEntity.status(HttpStatus.OK).body(responce.builder().data(document.getData())
-							.error("FALSE").message("FILE UPLOADED..!").build());
-				}
+			} catch (Exception e) {
+				// exception handle By Return Statement...!
 			}
 		}
-		return ResponseEntity.status(HttpStatus.OK)
+		return ResponseEntity.status(HttpStatus.BAD_REQUEST)
 				.body(responce.builder().error("FALSE").message("FILE NOT UPLOADED..!").build());
 	}
 
 	@GetMapping("/getfile")
 	public ResponseEntity<responce> getFile(@RequestParam String mainDealerID, @RequestParam String documentType,
 			HttpServletRequest request, HttpServletResponse response) throws IOException {
-		Documents documents = documentRepository.findById(documentType + "*" + mainDealerID).get();
-		System.out.println(documents);
-		response.setContentType(documents.getFileType());
-		String fileType = documents.getFileName();
-		String fileExtension = "";
-		if (fileType != null & fileType.contains(".")) {
-			String[] split = fileType.split("\\.");
-			fileExtension = '.' + split[1];
-		} else if (fileType != null) {
-			fileExtension = ".bin";
+		Documents documents = null;
+		try {
+			documents = documentRepository.findById(documentType + "*" + mainDealerID).get();
+		} catch (Exception e) {
+			// TODO: handle exception
+			// exception handle by return Statement...!
 		}
-
-		response.setHeader("Content-Disposition",
-				"attachment; filename=\"" + mainDealerID + "[" + documentType + "]" + fileExtension + "\"");
-		response.setContentLength((int) documents.getFileLength());
-
-		// Write the file data to the response's output stream
-		OutputStream out = response.getOutputStream();
-		out.write(documents.getData());
-		out.flush();
-		out.close();
-
 		if (documents != null) {
-			return ResponseEntity.status(HttpStatus.OK)
-					.body(responce.builder().data(documents.getData()).error("FALSE").message("FILE FIND..!").build());
-		} else {
-			return ResponseEntity.status(HttpStatus.OK)
-					.body(responce.builder().error("FALSE").message("FILE NOT UPLOADED..!").build());
-		}
-	}
-
-	@GetMapping("getallDocuments")
-	public ResponseEntity<responce> getALLFile(HttpServletRequest request, HttpServletResponse response)
-			throws IOException {
-		
-		
-		
-		List<Documents> getalldocument = documentRepository.getalldocument();
-		System.out.println("==============================================="+getalldocument.size());
-		getalldocument.stream().forEach(documents -> {
-
+			System.out.println(documents);
 			response.setContentType(documents.getFileType());
 			String fileType = documents.getFileName();
 			String fileExtension = "";
@@ -155,44 +132,22 @@ public class DocumentUploadController {
 			} else if (fileType != null) {
 				fileExtension = ".bin";
 			}
+
 			response.setHeader("Content-Disposition",
-					"attachment; filename=\"" + documents.getMainDealer().getMainDealerID() + "[" + documents.getFileName() + "]" + fileExtension + "\"");
+					"attachment; filename=\"" + mainDealerID + "[" + documentType + "]" + fileExtension + "\"");
 			response.setContentLength((int) documents.getFileLength());
 
 			// Write the file data to the response's output stream
-			OutputStream out = null;
-			try {
-				out = response.getOutputStream();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			try {
-				out.write(documents.getData());
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			try {
-				out.flush();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			try {
-				out.close();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		});
-		if (getalldocument != null) {
+			OutputStream out = response.getOutputStream();
+			out.write(documents.getData());
+			out.flush();
+			out.close();
+
 			return ResponseEntity.status(HttpStatus.OK)
-					.body(responce.builder().data("get all").error("FALSE").message("FILE FIND..!").build());
+					.body(responce.builder().data(documents.getData()).error("FALSE").message("FILE FIND..!").build());
 		} else {
-			return ResponseEntity.status(HttpStatus.OK)
-					.body(responce.builder().error("FALSE").message("FILE NOT UPLOADED..!").build());
+			return ResponseEntity.status(HttpStatus.NOT_FOUND)
+					.body(responce.builder().error("True").message("FILE NOT Avaliable..!").build());
 		}
 	}
-
 }

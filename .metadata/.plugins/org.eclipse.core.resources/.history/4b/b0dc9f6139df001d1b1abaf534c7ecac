@@ -1,0 +1,123 @@
+package com.cag.twowheeler.entity;
+
+import java.util.List;
+
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
+import javax.persistence.OneToMany;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
+
+@Entity
+@Getter
+@Setter
+@ToString
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
+public class MainDealer {
+	
+	@Id
+	private String mainDealerID;
+
+	@Column(name = "DealerName")
+	private String dealerName;
+
+	@Column(name = "ManufacturerName")
+	private String manufacturerName;
+
+	@Column(name = "MailID")
+	private String mailID;
+
+	@Column(name = "ContactNo")
+	private long contactNumber;
+
+	@Column(name = "AlternateContactNo")
+	private long alternateContactNumber;
+
+	@Column(name = "ContactPersonName")
+	private String contactPersonName;
+
+	@Column(name = "ContactPersonMobile")
+	private String contactPersonMobile; // newely Added
+
+	@Column(name = "PanNumber")
+	private String panNumber;
+
+	@Column(name = "GstNumber")
+	private String gstNumber;
+
+	@Column(name = "BankName")
+	private String bankName;
+
+	@Column(name = "BranchName")
+	private String bankBranchName;
+
+	@Column(name = "BankACNo")
+	private long bankAccNumber;
+
+	@Column(name = "IFSCCode")
+	private String ifsc;
+
+	@Column(name = "DealerAccountHolderName")
+	private String accountHolderName;
+
+//	@Column(name = "Status")
+//	private String status;
+
+//	private String reviewStatus; // non use
+
+	@Column(name = "PaymentEligible")
+	private String paymentEligible; // newely Added
+
+	@Column(name = "ActivationDate")
+	private String activationData;
+
+//	@Column(name = "ExpiryDate")
+//	private String expiryDate; // newely Added
+
+//	@Column(name = "UpdaterUserId")
+//	private String updaterUserId; // newely Added
+//
+//	@Column(name = "UpdatedDate")
+//	private String updatedDate; // newely Added
+
+	@Column(name = "State") // all address
+	private String state;
+
+	@Column(name = "District")
+	private String district;
+
+	@Column(name = "TownCityVillage")
+	private String city;
+
+	@Column(name = "PinCode")
+	private int pinCode;
+
+	@Column(name = "AddressDetails")
+	private String addressDetails;
+
+	@Column(name = "DealerType")
+	private String delearType;
+
+	@OneToMany(mappedBy = "mainDealers", cascade = CascadeType.ALL)
+	private List<SubDealer> subDealer;
+	
+	@ManyToMany(cascade = CascadeType.ALL)
+	@JoinTable(name = "maindealers__vehicles",
+	     joinColumns = @JoinColumn(name="mainDealerID"),
+	     inverseJoinColumns = @JoinColumn(name="vehicleVeriantId")
+	)
+	private List<VehicalPrice> Veriants;
+
+}

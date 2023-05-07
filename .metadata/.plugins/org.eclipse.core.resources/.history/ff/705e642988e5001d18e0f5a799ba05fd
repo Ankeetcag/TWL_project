@@ -1,0 +1,78 @@
+package com.cag.twowheeler.service;
+
+import java.util.List;
+import com.cag.twowheeler.dto.MainDealerDetailsDto;
+import com.cag.twowheeler.dto.SubDealerDetailsDto;
+import com.cag.twowheeler.dto.VehicleVariantDto;
+
+public interface TwoWheelerDealerService {
+
+	public Boolean addMainDealer(MainDealerDetailsDto dealerDetailsDto);
+
+	public Boolean addSubDealers(String mainDealerID,SubDealerDetailsDto subDealerDetailsDto);
+
+	public List<MainDealerDetailsDto> getMainDealersDetails();
+
+	public List<SubDealerDetailsDto> getSubDealerDetails(String mainDealerId);
+
+	public Boolean editSubDealer(String subDealerId, SubDealerDetailsDto subDetailsDto);
+
+	public Boolean editMainDealer(String mainDealerId,MainDealerDetailsDto  mainDetailsDto);
+	
+	public List<MainDealerDetailsDto> getMainDealer(String state, String city);
+
+	public List<String> getStates();
+
+	public List<String> getDistricts();
+	
+	public List<String> getOemBaseOnState(String state);
+
+	public List<MainDealerDetailsDto> getExcelFile();
+	
+	//==================Variants===========================================================
+	
+	public List<VehicleVariantDto> mainVariants(String DealerID);
+	
+	public List<VehicleVariantDto> avaliableMainVariants(String mainDealerID);
+	
+	public boolean addVeriantsMian(String mainDealerID,List<VehicleVariantDto> variants);
+	
+	public Boolean removeMainVariant(String mainDealerID,List<VehicleVariantDto> variants);
+	
+	//==================
+	
+	public List<VehicleVariantDto> subVariants(String DealerID);
+	
+	public List<VehicleVariantDto> avaliableSubVariants(String subDealerID);
+	
+	public boolean addVariantSub(String subDealerID,List<VehicleVariantDto> variants);
+
+	public Boolean removeSubVariant(String subDealerID,List<VehicleVariantDto> variants);
+	
+	//==================Branches============================================================
+
+	public String addMainBranches(String mainDealerID, List<String> branchIDs);
+
+	public Boolean removeMainBranches(String mainDealerID, List<String> branchIDs);
+
+	public List<String> showSubBranches(String subDealerID);
+
+	public List<String> showAvaliableSubBranches(String subDealerID);
+	
+	//====================
+
+	public String addSubBranches(String subDealerID, List<String> branchIDs);
+
+	public Boolean removeSubBranches(String subDealerID, List<String> branchIDs);
+
+	public List<String> showMainBranches(String mainDealerID,String region,String area);
+
+	public List<String> showAvaliableMainBranches(String mainDealerID);
+
+	
+
+	
+
+	
+
+}

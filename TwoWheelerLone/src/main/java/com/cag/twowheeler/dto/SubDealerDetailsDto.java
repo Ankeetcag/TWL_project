@@ -42,8 +42,6 @@ public class SubDealerDetailsDto {
 	private LocalDate subDealerExpireData;
 	private String state;
 	private String district;
-	private String region;
-	private String area;
 	private String city;
 	private String pinCode;
 	private String addressDetails;

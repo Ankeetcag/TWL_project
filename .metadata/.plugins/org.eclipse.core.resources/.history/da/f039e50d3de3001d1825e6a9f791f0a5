@@ -1,0 +1,63 @@
+package com.cag.twowheeler.controller;
+
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+@CrossOrigin(origins = "*")
+public class TwowheelerNotificatationController {
+	
+	
+	
+	/**
+     * LOGIC FOR SEND EMAIL.....!
+     */
+    private void SendMail(String url, UserRegistation userdetails) {
+
+        String host = "smtp.gmail.com";
+        
+        Properties properties = System.getProperties();
+        properties.put("mail.smtp.host", host);
+        properties.put("mail.smtp.port", 465);
+        properties.put("mail.smtp.ssl.enable", "true");
+        properties.put("mail.smtp.auth", "true");
+
+        Session session = Session.getInstance(properties, new Authenticator() {
+            @Override
+            protected PasswordAuthentication getPasswordAuthentication() {
+                return new PasswordAuthentication("dummymail.fake.massage@gmail.com", "psamhyawiykfxfba");
+            }
+        });
+        session.setDebug(true);
+        // compose the massage
+        MimeMessage obj = new MimeMessage(session);
+        try {
+            obj.setFrom(new InternetAddress("dummymail.fake.massage@gmail.com"));
+            obj.addRecipient(Message.RecipientType.TO, new InternetAddress(userdetails.getEmailid()));
+            obj.setSubject("Thank You for Registation... click the link for Authentication");
+//            obj.setText(url + "  \n" + "From Ankit....! " );
+            MimeMultipart mimeMultipart=new MimeMultipart();
+            MimeBodyPart textpart=new MimeBodyPart();
+            MimeBodyPart filepart=new MimeBodyPart();
+            
+            
+            textpart.setText(url + "  \n" + "From Ankit....! "+"\n Attachmeant Pdf is Password Protected\n");
+            try {
+                filepart.attachFile(new File("C:\\Users\\Ankeet\\Desktop\\jasper report\\address.txt"));
+            } catch (IOException e) {//"C:\Users\Ankeet\Desktop\jasper report\address.txt"
+                e.printStackTrace();
+            }
+            
+            mimeMultipart.addBodyPart(textpart);
+            mimeMultipart.addBodyPart(filepart);
+            obj.setContent(mimeMultipart);
+            // send massage to Transport class..
+            Transport.send(obj);
+            log.info("Mail send sucessfuly.....!");
+        } catch (MessagingException e) {
+            e.printStackTrace();
+            log.error("Exceptation print.........!");
+        }
+    }
+
+}

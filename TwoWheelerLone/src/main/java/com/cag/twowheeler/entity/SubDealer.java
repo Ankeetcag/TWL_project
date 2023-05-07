@@ -54,7 +54,7 @@ public class SubDealer {
 	private String contactPersonName;          
 	
 	@Column(name = "ContactPersonMobile")
-	private String contactPersonMobile;          //newely Added
+	private String contactPersonMobile;         
 	
 	@Column(name="PanNumber")
 	private String panNumber;
@@ -92,11 +92,23 @@ public class SubDealer {
 	@Column(name = "ExpiryDate")
 	private LocalDate expiryDate;				 
 	
-//	@Column(name = "UpdaterUserId")
-//	private String updaterUserId;			
-											//NEWLY Added
-//	@Column(name = "UpdatedDate")
-//	private String updatedDate;				
+	@Column(name = "MakerUserID")
+	private String makerUserID;
+	
+	@Column(name = "MakerDate")
+	private LocalDate makerDate;
+	
+	@Column(name = "UpdaterUserID")
+	private String updaterUserID; 
+
+	@Column(name = "UpdatedDate")
+	private String updatedDate; 
+	
+	@Column(name = "CheckerID")
+	private String checkerUserID;
+	
+	@Column(name = "CheckerDate")
+	private LocalDate checkerDate;		
 	
 	@Column(name = "State")                
 	private String state;

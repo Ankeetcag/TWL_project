@@ -1,0 +1,5 @@
+package com.cag.twowheeler.repository;
+
+public class BranchRepository {
+
+}

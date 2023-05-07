@@ -1,0 +1,28 @@
+package com.te.ccheck;
+
+import java.time.LocalDate;
+import java.util.Arrays;
+
+public class date{
+	//LEARN SUM 
+//	sub string 
+//	sub sequence
+
+
+	public static void main(String[] args) {
+
+		String fileType = "download.jfif";
+		System.err.println("================================================="+fileType);
+		String fileExtension="";
+		if(fileType!=null & fileType.contains(".")) {
+			String[] split = fileType.split(".");
+			System.out.println( Arrays.toString(split));
+//			fileExtension='.'+split[0];
+		}else if (fileType!=null) {
+			fileExtension=".bin";
+		} 
+		
+		System.err.println(fileExtension);
+		
+	}
+}

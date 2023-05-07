@@ -1,0 +1,43 @@
+package com.cag.twowheeler.entity;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+
+import lombok.Data;
+
+@Entity
+@Data
+public class Branch {
+
+	@Id
+	private String GLBranchT24ID;
+	
+	@Column(name = "RFBranchT24ID")
+	private String rfBranchT24ID;
+	
+	@Column(name = "RFBranch")
+	private String rfBranch;
+	
+	@Column(name = "Region")
+	private String region;
+	
+	@Column(name = "Area")
+	private String area;
+	
+	@Column(name = "State")
+	private String state;
+	
+	@Column(name = "GLBranchesMappedToRf")
+	private String glBranchesMappedToRF;
+	
+	
+	
+
+
+
+	
+//	@OneToMany(mappedBy = "branch",cascade = CascadeType.ALL)
+//	List<MainDealer> mainDealer;
+
+}

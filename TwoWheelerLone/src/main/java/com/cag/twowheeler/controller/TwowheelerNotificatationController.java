@@ -18,11 +18,7 @@ import javax.mail.internet.MimeMultipart;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RestController;
 
 import com.cag.twowheeler.dto.MailNotificatationData;
 import com.cag.twowheeler.entity.MainDealer;
@@ -45,7 +41,13 @@ public class TwowheelerNotificatationController {
 	long checker = 0;
 	long updaterchecker = 0;
 
-	@Scheduled(cron = "45 37 10 * * *")
+	
+	
+	/**
+	 * @API USE TO GET  EMAILS TO SEND NOTIFICATATION...!
+	 * @API WILL RUN AUTOMATICLY EVERY DAY 10hr:37min:14sec AM 
+	 */
+//	@Scheduled(cron = "45 37 10 * * *")
 	public ResponseEntity<responce> getNotificatation() {
 		updaterchecker = checker;
 		LocalDate date = LocalDate.now().minusMonths(1);

@@ -1,0 +1,22 @@
+package com.te.ccheck;
+
+import java.time.LocalDate;
+import java.util.Arrays;
+
+public class date{
+	//LEARN SUM 
+//	sub string 
+//	sub sequence
+
+
+	public static void main(String[] args) {
+
+//		String Str="TVS";
+//		System.out.println(Str.substring(0, 3));
+		int year = LocalDate.now().getYear();
+		System.out.println(year+3);
+		System.out.println(LocalDate.now().getYear()+""+LocalDate.now().getDayOfMonth()+""+LocalDate.now().getMonth());
+		
+		
+	}
+}

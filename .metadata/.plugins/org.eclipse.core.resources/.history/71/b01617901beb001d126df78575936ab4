@@ -1,0 +1,27 @@
+package com.te.ccheck;
+
+import java.time.LocalDate;
+import java.util.Arrays;
+
+public class date{
+	//LEARN SUM 
+//	sub string 
+//	sub sequence
+
+
+	public static void main(String[] args) {
+
+		String Str="MHHON-0001-A01";
+		System.out.println(Str.substring(12));
+//		LocalDate year = LocalDate.now();
+//		System.out.println(year+3);
+//		System.out.println(LocalDate.now().getYear()+" "+LocalDate.now().getDayOfMonth()+" "+LocalDate.now().getMonth());
+//		System.out.println(LocalDate.now().getDayOfYear());
+//		System.out.println(LocalDate.now().getDayOfWeek());
+//		System.out.println(LocalDate.now().getChronology());
+		
+//		System.out.println(LocalDate.now().minusMonths(1));
+		
+		
+	}
+}
